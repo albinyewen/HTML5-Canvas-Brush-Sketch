@@ -1,59 +1,100 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name=viewport content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  
-<title>Stylistic Sketchy</title>
+  <head>
+    <script src="js/jquery-1.7.min.js"></script>
+    <script src="js/modernizr.custom.34982.js"></script>
 
-<script src="js/jquery-1.7.min.js"></script>
-<script src="js/modernizr.custom.34982.js"></script>
+    <script src="js/sketcher.js"></script>
+    <script src="js/draft.js"></script>
+    <script src="js/trigonometry.js"></script>
 
-<script src="js/sketcher.js"></script>
-<script src="js/trigonometry.js"></script>
+    <style>
+      #sketch{
+      position : fixed;
+      float: left;
+      }
+      .draft{
+      position : fixed;
+      top: 0px;
+      }
 
-<link rel="stylesheet" href="assets/bootstrap.css" />
-<link rel="stylesheet" href="assets/styles.css" />
+      .tool{
+      position: absolute;
+      width: 100%
+      height: 100px;
+      bottom: 0px;
+      }
+      
+      ul, li{
+      clear:both;
+      list-style:none;
+      margin:0 auto;
+      display: inline; 
+      }
+      canvas: {
+      width: 100%;
+      height: 100%;
+      }
+    </style>
 
-<script>
-var sketcher = null;
-var brush = null;
+    <script>
+      var sketcher = null;
+      var brush = null;
 
-$(document).ready(function(e) {
-	
-	brush = new Image();
-	  brush.src = 'assets/brush2.png';
-	  brush.onload = function(){
-		sketcher = new Sketcher( "sketch", brush );
-	  }
-	
-});
+      $(document).ready(function(e) {
+      brush = new Image();
+      brush.src = 'assets/brush2.png';
+      brush.onload = function(){
 
-</script>
+      draft = new Draft("drafts", true, 100);     
+      left = new Sketcher( "sketch_left", brush, function(){
+      draw(right);
+      });
+      right = new Sketcher( "sketch_right", brush, function(){
+      draw(left);
+      });
 
-</head>
+      $("#drafts")[0].width = $(document).width();
+      $("#drafts")[0].height = $(document).height();
+      $("#sketch_left")[0].width = $(document).width() * 0.48;
+      $("#sketch_left")[0].height = $(document).height();
 
-<body>
-<div class="topbar-wrapper" style="z-index: 5;">
-    <div class="topbar" data-dropdown="dropdown">
-      <div class="topbar-inner">
-        <div class="container">
-          <h3><a href="#">Stylistic Sketchy</a></h3>
-          
-          <ul class="nav">
-            <li class="active"><a href="#">a sketch app using "brush" images</a></li>
-          </ul>
-          
-          <ul class="nav secondary-nav">
-            <a href="#">
-             <input type="button" class="btn error" value="clear"
-             	onclick="sketcher.clear();" />
-             </a>
-          </ul>
-        </div>
-      </div><!-- /topbar-inner -->
-    </div><!-- /topbar -->
-  </div>
-    <canvas id="sketch" width="1024" height="640" />
-</body>
+      $("#sketch_right")[0].width = $(document).width() * 0.48;
+      $("#sketch_right")[0].height = $(document).height();
+
+      $("#lines")[0].width = $(document).width();
+      $("#lines")[0].height = $(document).height();
+      
+      lines = new Draft("lines", true, 50);     
+      draft.rect = lines.drawLines();
+      }
+      });
+
+      function draw(ske){
+      if(ske.minX != -1){
+      draft.draw(ske.canvas[0]);
+      ske.clear();
+      }
+      }
+    </script>
+
+  </head>
+
+  <body>
+    <canvas id="lines" class="draft"></canvas>
+    <canvas id="drafts" class="draft"></canvas>
+    <div id="sketch">
+      <canvas id="sketch_left" class="writer"></canvas>
+      <canvas id="sketch_right" class="writer"></canvas>
+    </div>
+    <div class="pencil">    
+      <ul class="tool">                                
+        <li><a class="btn_pen" href="javascript:draft.del()">删除</a></li>            
+        <li><a class="btn_mark" href="javascript:draft.clear()">清除</a></li>            
+	<li><a class="btn_mark" href="javascript:draft.space()">空格</a></li>            
+	<li><a class="btn_mark" href="javascript:draft.nextLine()">换行</a></li>            
+        <li><a class="btn_eraser" href="javascript:draft.toDataURL()">上传</a></li>    
+      </ul>
+    </div>
+  </body>
 </html>
